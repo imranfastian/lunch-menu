@@ -1,0 +1,60 @@
+Table restaurants {
+  id serial [pk]
+  name varchar(200) [not null]
+  description varchar(1000)
+  address varchar(500)
+  coordinate jsonb
+  homepage varchar(500)
+  region varchar(100)
+  phone varchar(50)
+  email varchar(100)
+  is_active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table menu_items {
+  id serial [pk]
+  restaurant_id integer [not null, ref: > restaurants.id]
+  name varchar(200) [not null]
+  description varchar(1000)
+  price decimal(10,2)
+  category varchar(100)
+  is_available boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table users {
+  id serial [pk]
+  username varchar(100) [not null, unique]
+  password_hash varchar(255) [not null]
+  email varchar(200) [unique]
+  role varchar(50) [not null, note: 'e.g. admin, customer']
+  is_active boolean [default: true]
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+Table refresh_tokens {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id integer [ref: > users.id]
+  token_hash varchar(255) [not null]
+  user_agent text
+  ip_address inet
+  created_at timestamptz [default: `now()`]
+  expires_at timestamptz
+  revoked_at timestamptz
+}
+
+Table audit_logs {
+  id bigserial [pk]
+  actor_user_id integer [ref: > users.id]
+  action varchar(100)
+  target_table varchar(100)
+  target_id text
+  before jsonb
+  after jsonb
+  ip_address inet
+  created_at timestamptz [default: `now()`]
+}

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lunch-menu-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lunch-menu-api
+  template:
+    metadata:
+      labels:
+        app: lunch-menu-api
+    spec:
+      containers:
+        - name: lunch-menu-api
+          image: imranfastian1982/lunch-menu-api:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: lunch-menu-config
+            - secretRef:
+                name: lunch-menu-secret

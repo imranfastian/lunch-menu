@@ -1,0 +1,601 @@
+definitions:
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  models.MenuItem:
+    properties:
+      category:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      is_available:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      restaurant_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.Restaurant:
+    properties:
+      address:
+        type: string
+      coordinate:
+        description: Store as JSONB in Postgres
+        items:
+          type: number
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      homepage:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      region:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.RestaurantInput:
+    properties:
+      address:
+        type: string
+      coordinate:
+        description: '[lat, lng]'
+        items:
+          type: number
+        type: array
+      description:
+        type: string
+      email:
+        type: string
+      homepage:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      region:
+        type: string
+    required:
+    - address
+    - coordinate
+    - email
+    - name
+    type: object
+  models.RestaurantResponse:
+    properties:
+      restaurant:
+        $ref: '#/definitions/models.Restaurant'
+    type: object
+  models.RestaurantsResponse:
+    properties:
+      restaurants:
+        items:
+          $ref: '#/definitions/models.Restaurant'
+        type: array
+      total:
+        type: integer
+    type: object
+  models.SafeUser:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  models.StandardResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/models.ErrorResponse'
+      message:
+        type: string
+    type: object
+  models.UserInput:
+    properties:
+      email:
+        type: string
+      password_hash:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password_hash
+    - role
+    - username
+    type: object
+  models.UserLoginInput:
+    properties:
+      password_hash:
+        type: string
+      username:
+        type: string
+    required:
+    - password_hash
+    - username
+    type: object
+info:
+  contact: {}
+paths:
+  /api:
+    get:
+      description: Returns basic API information and version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Get API information
+      tags:
+      - info
+  /api/statistics:
+    get:
+      description: Returns business analytics and statistics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Get business statistics
+      tags:
+      - statistics
+  /menu-items:
+    get:
+      description: Get a paginated list of menu items
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: List menu items
+      tags:
+      - menu-items
+    post:
+      consumes:
+      - application/json
+      description: 'Admin only: create a new menu item'
+      parameters:
+      - description: Menu Item Input
+        in: body
+        name: menu_item
+        required: true
+        schema:
+          $ref: '#/definitions/models.MenuItem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new menu item
+      tags:
+      - menu-items
+  /menu-items/{id}:
+    delete:
+      description: 'Admin only: delete a menu item'
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a menu item
+      tags:
+      - menu-items
+    get:
+      description: Get a menu item by ID
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Get a menu item
+      tags:
+      - menu-items
+    put:
+      consumes:
+      - application/json
+      description: 'Admin only: update an existing menu item'
+      parameters:
+      - description: Menu Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Menu Item Input
+        in: body
+        name: menu_item
+        required: true
+        schema:
+          $ref: '#/definitions/models.MenuItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a menu item
+      tags:
+      - menu-items
+  /restaurants:
+    get:
+      description: Get a paginated list of restaurants
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RestaurantsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List restaurants
+      tags:
+      - restaurants
+    post:
+      consumes:
+      - application/json
+      description: 'Admin only: create a new restaurant'
+      parameters:
+      - description: Restaurant Input
+        in: body
+        name: restaurant
+        required: true
+        schema:
+          $ref: '#/definitions/models.RestaurantInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RestaurantResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new restaurant
+      tags:
+      - restaurants
+  /restaurants/{id}:
+    delete:
+      description: 'Admin only: delete a restaurant'
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a restaurant
+      tags:
+      - restaurants
+    get:
+      description: Get a restaurant by ID
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RestaurantResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a restaurant
+      tags:
+      - restaurants
+    put:
+      consumes:
+      - application/json
+      description: 'Admin only: update an existing restaurant'
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Restaurant Input
+        in: body
+        name: restaurant
+        required: true
+        schema:
+          $ref: '#/definitions/models.RestaurantInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RestaurantResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a restaurant
+      tags:
+      - restaurants
+  /restaurants/{id}/menu:
+    get:
+      description: Get a paginated list of menu items for a specific restaurant
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Get menu items for a restaurant
+      tags:
+      - menu-items
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login as admin user and receive JWT
+      parameters:
+      - description: Login Input
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserLoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SafeUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login as admin
+      tags:
+      - users
+  /user/logout:
+    post:
+      description: Logout the current user and expire tokens
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StandardResponse'
+      summary: Logout user
+      tags:
+      - users
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new admin user (admin only)
+      parameters:
+      - description: User Input
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SafeUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Register a new admin user
+      tags:
+      - users
+swagger: "2.0"

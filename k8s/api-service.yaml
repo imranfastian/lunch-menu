@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lunch-menu-api
+spec:
+  type: ClusterIP
+  selector:
+    app: lunch-menu-api
+  ports:
+    - port: 8000
+      targetPort: 8000

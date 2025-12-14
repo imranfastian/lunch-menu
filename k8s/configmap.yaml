@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lunch-menu-config
+data:
+  DB_NAME: lunch_menu
+  DB_USER: db_user
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_SSLMODE: disable
+  INTERVAL: 10s
+  TIMEOUT: 5s
+  RETRIES: "5"
+  ACCESS_COOKIE_NAME: access_token
+  ACCESS_COOKIE_AGE: "1200"
+  REFRESH_COOKIE_NAME: refresh_token
+  REFRESH_COOKIE_AGE: "604800"
+  CSRF_COOKIE_NAME: csrf_token
+  CSRF_COOKIE_AGE: "3600"
+  COOKIE_DOMAIN: localhost
+  COOKIE_PATH: /
+  COOKIE_SECURE: "true"
+  COOKIE_HTTPONLY: "true"
+  COOKIE_SAMESITE: Lax

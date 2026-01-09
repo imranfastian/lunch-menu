@@ -1,3 +1,5 @@
+version: "1.0"
+name: lunch_menu
 services:
   postgres:
     image: postgres:15-alpine
@@ -21,6 +23,8 @@ services:
       interval: ${INTERVAL}
       timeout: ${TIMEOUT}
       retries: ${RETRIES}
+    networks:
+      - lunch-menu-net
 
   api:
     build: .
@@ -42,6 +46,12 @@ services:
         condition: service_healthy
     volumes:
       - ./:/app
+    networks:
+      - lunch-menu-net
 
 volumes:
   postgres_data:
+
+networks:
+  lunch-menu-net:
+    driver: bridge
